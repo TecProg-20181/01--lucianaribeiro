@@ -7,10 +7,6 @@ typedef struct _pixel {
 } Pixel;
 
 typedef struct _image {
-    // [width][height][rgb]
-    // 0 -> red
-    // 1 -> green
-    // 2 -> blue
     Pixel pixel[512][512];
     unsigned int width;
     unsigned int height;
@@ -31,15 +27,15 @@ Image cortarImagem(Image, int, int, int, int);
 int main() {
     Image img;
 
-    // read type of image
+
     char p3[4];
     scanf("%s", p3);
 
-    // read width height and color of image
+
     int max_color;
     scanf("%u %u %d", &img.width, &img.height, &max_color);
 
-    // read all pixels of image
+
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
             scanf("%hu %hu %hu", &img.pixel[i][j].red,
@@ -57,21 +53,21 @@ int main() {
         scanf("%d", &opcao);
 
         switch(opcao) {
-            case 1: { // Escala de Cinza
+            case 1: {
                 img = escalaCinza(img);
                 break;
             }
-             case 2: { // Filtro Sepia
+             case 2: {
                  img = sepia(img);
                  break;
              }
-             case 3: { // Blur
+             case 3: {
                  int tamanho = 0;
                  scanf("%d", &tamanho);
                  img = blur(img, tamanho);
                  break;
              }
-             case 4: { // Rotacao
+             case 4: {
                  int quantidade = 0;
                  scanf("%d", &quantidade);
 
@@ -82,7 +78,7 @@ int main() {
                  }
                  break;
              }
-             case 5: { // Espelhamento
+             case 5: {
                  int horizontal = 0;
                  scanf("%d", &horizontal);
 
@@ -90,11 +86,11 @@ int main() {
 
                  break;
              }
-             case 6: { // Inversao de Cores
+             case 6: {
                  img = inverterCores(img);
                  break;
              }
-             case 7: { // Cortar Imagem
+             case 7: {
                  int x, y;
                  scanf("%d %d", &x, &y);
                  int width, height;
@@ -107,12 +103,12 @@ int main() {
 
     }
 
-    // print type of image
+
     printf("P3\n");
-    // print width height and color of image
+
     printf("%u %u\n255\n", img.width, img.height);
 
-    // print pixels of image
+
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
             printf("%hu %hu %hu ", img.pixel[i][j].red,
