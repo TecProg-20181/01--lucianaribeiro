@@ -112,50 +112,86 @@ Image escala_de_cinza(Image img) {
      return img;
  }
 
-// Image rotacionar90direita(Image img) {
-//     Image rotacionada;
-//
-//     rotacionada.width = img.height;
-//     rotacionada.height = img.width;
-//
-//     for (unsigned int i = 0, y = 0; i < rotacionada.height; ++i, ++y) {
-//         for (int j = rotacionada.width - 1, x = 0; j >= 0; --j, ++x) {
-//             rotacionada.pixel[i][j].red = img.pixel[x][y].red;
-//             rotacionada.pixel[i][j].green = img.pixel[x][y].green;
-//             rotacionada.pixel[i][j].blue = img.pixel[x][y].blue;
-//         }
-//     }
-//
-//     return rotacionada;
-// }
-//
-// void inverter_cores(unsigned short int pixel[512][512][3],
-//                     unsigned int width, unsigned int height) {
-//     for (unsigned int i = 0; i < height; ++i) {
-//         for (unsigned int j = 0; j < width; ++j) {
-//             pixel[i][j].red = 255 - pixel[i][j].red;
-//             pixel[i][j].green = 255 - pixel[i][j].green;
-//             pixel[i][j].blue = 255 - pixel[i][j].blue;
-//         }
-//     }
-// }
-//
-// Image cortar_imagem(Image img, int x, int y, int width, int height) {
-//     Image cortada;
-//
-//     cortada.width = width;
-//     cortada.height = height;
-//
-//     for(int i = 0; i < height; ++i) {
-//         for(int j = 0; j < width; ++j) {
-//             cortada.pixel[i][j].red = img.pixel[i + y][j + x].red;
-//             cortada.pixel[i][j].green = img.pixel[i + y][j + x].green;
-//             cortada.pixel[i][j].blue = img.pixel[i + y][j + x].blue;
-//         }
-//     }
-//
-//     return cortada;
-// }
+ Image rotacionar90direita(Image img) {
+
+     Image rotacionada;
+
+     rotacionada.width = img.height;
+     rotacionada.height = img.width;
+
+     for (unsigned int i = 0, y = 0; i < rotacionada.height; ++i, ++y) {
+         for (int j = rotacionada.width - 1, x = 0; j >= 0; --j, ++x) {
+             rotacionada.pixel[i][j].red = img.pixel[x][y].red;
+             rotacionada.pixel[i][j].green = img.pixel[x][y].green;
+             rotacionada.pixel[i][j].blue = img.pixel[x][y].blue;
+         }
+     }
+
+     return rotacionada;
+ }
+
+ Image espelhamento(Image img, int horizontal) {
+
+   int width = img.width;
+   int height = img.height;
+
+   if (horizontal == 1)
+      width /= 2;
+   else
+      height /= 2;
+
+   for (int i2 = 0; i2 < height; ++i2) {
+       for (int j = 0; j < width; ++j) {
+           int x = i2, y = j;
+
+           if (horizontal == 1) y = img.width - 1 - j;
+           else x = img.height - 1 - i2;
+
+           Pixel aux1;
+           aux1.red = img.pixel[i2][j].red;
+           aux1.green = img.pixel[i2][j].green;
+           aux1.blue = img.pixel[i2][j].blue;
+
+           img.pixel[i2][j].red = img.pixel[x][y].red;
+           img.pixel[i2][j].green = img.pixel[x][y].green;
+           img.pixel[i2][j].blue = img.pixel[x][y].blue;
+
+           img.pixel[x][y].red = aux1.red;
+           img.pixel[x][y].green = aux1.green;
+           img.pixel[x][y].blue = aux1.blue;
+       }
+   }
+
+   return img;
+ }
+
+ Image inverter_cores(Image img) {
+     for (unsigned int i = 0; i < img.height; ++i) {
+         for (unsigned int j = 0; j < img.width; ++j) {
+             img.pixel[i][j].red = 255 - img.pixel[i][j].red;
+             img.pixel[i][j].green = 255 - img.pixel[i][j].green;
+             img.pixel[i][j].blue = 255 - img.pixel[i][j].blue;
+         }
+     }
+     return img;
+ }
+
+ Image cortar_imagem(Image img, int x, int y, int width, int height) {
+     Image cortada;
+
+     cortada.width = width;
+     cortada.height = height;
+
+     for(int i = 0; i < height; ++i) {
+         for(int j = 0; j < width; ++j) {
+             cortada.pixel[i][j].red = img.pixel[i + y][j + x].red;
+             cortada.pixel[i][j].green = img.pixel[i + y][j + x].green;
+             cortada.pixel[i][j].blue = img.pixel[i + y][j + x].blue;
+         }
+     }
+
+     return cortada;
+ }
 
 
 int main() {
@@ -201,60 +237,38 @@ int main() {
                  img = blur(img, tamanho);
                  break;
              }
-            // case 4: { // Rotacao
-            //     int quantas_vezes = 0;
-            //     scanf("%d", &quantas_vezes);
-            //     quantas_vezes %= 4;
-            //     for (int j = 0; j < quantas_vezes; ++j) {
-            //         img = rotacionar90direita(img);
-            //     }
-            //     break;
-            // }
-            // case 5: { // Espelhamento
-            //     int horizontal = 0;
-            //     scanf("%d", &horizontal);
-            //
-            //     int width = img.width, height = img.height;
-            //
-            //     if (horizontal == 1) width /= 2;
-            //     else height /= 2;
-            //
-            //     for (int i2 = 0; i2 < height; ++i2) {
-            //         for (int j = 0; j < width; ++j) {
-            //             int x = i2, y = j;
-            //
-            //             if (horizontal == 1) y = img.width - 1 - j;
-            //             else x = img.height - 1 - i2;
-            //
-            //             Pixel aux1;
-            //             aux1.red = img.pixel[i2][j].red;
-            //             aux1.green = img.pixel[i2][j].green;
-            //             aux1.blue = img.pixel[i2][j].blue;
-            //
-            //             img.pixel[i2][j].red = img.pixel[x][y].red;
-            //             img.pixel[i2][j].green = img.pixel[x][y].green;
-            //             img.pixel[i2][j].blue = img.pixel[x][y].blue;
-            //
-            //             img.pixel[x][y].red = aux1.red;
-            //             img.pixel[x][y].green = aux1.green;
-            //             img.pixel[x][y].blue = aux1.blue;
-            //         }
-            //     }
-            //     break;
-            // }
-            // case 6: { // Inversao de Cores
-            //     inverter_cores(img.pixel, img.width, img.height);
-            //     break;
-            // }
-            // case 7: { // Cortar Imagem
-            //     int x, y;
-            //     scanf("%d %d", &x, &y);
-            //     int width, height;
-            //     scanf("%d %d", &width, &height);
-            //
-            //     img = cortar_imagem(img, x, y, width, height);
-            //     break;
-            // }
+             case 4: { // Rotacao
+                 int quantidade = 0;
+                 scanf("%d", &quantidade);
+
+                 quantidade %= 4;
+
+                 for (int j = 0; j < quantidade; ++j) {
+                     img = rotacionar90direita(img);
+                 }
+                 break;
+             }
+             case 5: { // Espelhamento
+                 int horizontal = 0;
+                 scanf("%d", &horizontal);
+
+                 img = espelhamento(img, horizontal);
+
+                 break;
+             }
+             case 6: { // Inversao de Cores
+                 img = inverter_cores(img);
+                 break;
+             }
+             case 7: { // Cortar Imagem
+                 int x, y;
+                 scanf("%d %d", &x, &y);
+                 int width, height;
+                 scanf("%d %d", &width, &height);
+
+                 img = cortar_imagem(img, x, y, width, height);
+                 break;
+             }
         }
 
     }
