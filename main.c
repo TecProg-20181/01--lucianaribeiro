@@ -16,182 +16,16 @@ typedef struct _image {
     unsigned int height;
 } Image;
 
+int maximo(int, int);
+int minimo(int, int);
 
-int maximo(int sizeOne, int sizeTwo) {
-    if (sizeOne > sizeTwo)
-        return sizeOne;
-    return sizeTwo;
-}
-
-int minimo(int sizeOne, int sizeTwo) {
-    if (sizeOne < sizeTwo)
-        return sizeOne;
-    return sizeTwo;
-}
-
-int pixel_igual(Pixel p1, Pixel p2) {
-    if (p1.red == p2.red &&
-        p1.green == p2.green &&
-        p1.blue == p2.blue)
-        return 1;
-    return 0;
-}
-
-
-Image escala_de_cinza(Image img) {
-
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            int media = img.pixel[i][j].red +
-                        img.pixel[i][j].green +
-                        img.pixel[i][j].blue;
-            media /= 3;
-            img.pixel[i][j].red = media;
-            img.pixel[i][j].green = media;
-            img.pixel[i][j].blue = media;
-        }
-    }
-
-    return img;
-}
-
-  Image sepia(Image img) {
-
-    for (unsigned int x = 0; x < img.height; ++x) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            unsigned short int pixel[3];
-            pixel[0] = img.pixel[x][j].red;
-            pixel[1] = img.pixel[x][j].green;
-            pixel[2] = img.pixel[x][j].blue;
-
-            int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
-            int menor_r = (255 >  p) ? p : 255;
-            img.pixel[x][j].red = menor_r;
-
-            p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
-            menor_r = (255 >  p) ? p : 255;
-            img.pixel[x][j].green = menor_r;
-
-            p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
-            menor_r = (255 >  p) ? p : 255;
-            img.pixel[x][j].blue = menor_r;
-        }
-    }
-
-    return img;
-  }
-
- Image blur(Image img, int tamanho) {
-
-   Image blur;
-
-     for (unsigned int i = 0; i < img.height; ++i) {
-         for (unsigned int j = 0; j < img.width; ++j) {
-             Pixel media = {0, 0, 0};
-
-             int menor_height = minimo(img.height - 1, i + tamanho/2);
-             int min_width = minimo(img.width - 1, j + tamanho/2);
-
-             for(int x = maximo(0, i - tamanho/2); x <= menor_height; ++x) {
-                 for(int y = maximo(0, j - tamanho/2); y <= min_width; ++y) {
-                     media.red += img.pixel[x][y].red;
-                     media.green += img.pixel[x][y].green;
-                     media.blue += img.pixel[x][y].blue;
-                 }
-             }
-
-             media.red /= tamanho * tamanho;
-             media.green /= tamanho * tamanho;
-             media.blue /= tamanho * tamanho;
-
-             img.pixel[i][j].red = media.red;
-             img.pixel[i][j].green = media.green;
-             img.pixel[i][j].blue = media.blue;
-         }
-     }
-     return img;
- }
-
- Image rotacionar90direita(Image img) {
-
-     Image rotacionada;
-
-     rotacionada.width = img.height;
-     rotacionada.height = img.width;
-
-     for (unsigned int i = 0, y = 0; i < rotacionada.height; ++i, ++y) {
-         for (int j = rotacionada.width - 1, x = 0; j >= 0; --j, ++x) {
-             rotacionada.pixel[i][j].red = img.pixel[x][y].red;
-             rotacionada.pixel[i][j].green = img.pixel[x][y].green;
-             rotacionada.pixel[i][j].blue = img.pixel[x][y].blue;
-         }
-     }
-
-     return rotacionada;
- }
-
- Image espelhamento(Image img, int horizontal) {
-
-   int width = img.width;
-   int height = img.height;
-
-   if (horizontal == 1)
-      width /= 2;
-   else
-      height /= 2;
-
-   for (int i2 = 0; i2 < height; ++i2) {
-       for (int j = 0; j < width; ++j) {
-           int x = i2, y = j;
-
-           if (horizontal == 1) y = img.width - 1 - j;
-           else x = img.height - 1 - i2;
-
-           Pixel aux1;
-           aux1.red = img.pixel[i2][j].red;
-           aux1.green = img.pixel[i2][j].green;
-           aux1.blue = img.pixel[i2][j].blue;
-
-           img.pixel[i2][j].red = img.pixel[x][y].red;
-           img.pixel[i2][j].green = img.pixel[x][y].green;
-           img.pixel[i2][j].blue = img.pixel[x][y].blue;
-
-           img.pixel[x][y].red = aux1.red;
-           img.pixel[x][y].green = aux1.green;
-           img.pixel[x][y].blue = aux1.blue;
-       }
-   }
-
-   return img;
- }
-
- Image inverter_cores(Image img) {
-     for (unsigned int i = 0; i < img.height; ++i) {
-         for (unsigned int j = 0; j < img.width; ++j) {
-             img.pixel[i][j].red = 255 - img.pixel[i][j].red;
-             img.pixel[i][j].green = 255 - img.pixel[i][j].green;
-             img.pixel[i][j].blue = 255 - img.pixel[i][j].blue;
-         }
-     }
-     return img;
- }
-
- Image cortar_imagem(Image img, int x, int y, int width, int height) {
-     Image cortada;
-
-     cortada.width = width;
-     cortada.height = height;
-
-     for(int i = 0; i < height; ++i) {
-         for(int j = 0; j < width; ++j) {
-             cortada.pixel[i][j].red = img.pixel[i + y][j + x].red;
-             cortada.pixel[i][j].green = img.pixel[i + y][j + x].green;
-             cortada.pixel[i][j].blue = img.pixel[i + y][j + x].blue;
-         }
-     }
-
-     return cortada;
- }
+Image escalaCinza(Image);
+Image sepia(Image);
+Image blur(Image, int);
+Image rotacionar90direita(Image);
+Image espelhamento(Image, int);
+Image inverterCores(Image);
+Image cortarImagem(Image, int, int, int, int);
 
 
 int main() {
@@ -224,7 +58,7 @@ int main() {
 
         switch(opcao) {
             case 1: { // Escala de Cinza
-                img = escala_de_cinza(img);
+                img = escalaCinza(img);
                 break;
             }
              case 2: { // Filtro Sepia
@@ -257,7 +91,7 @@ int main() {
                  break;
              }
              case 6: { // Inversao de Cores
-                 img = inverter_cores(img);
+                 img = inverterCores(img);
                  break;
              }
              case 7: { // Cortar Imagem
@@ -266,7 +100,7 @@ int main() {
                  int width, height;
                  scanf("%d %d", &width, &height);
 
-                 img = cortar_imagem(img, x, y, width, height);
+                 img = cortarImagem(img, x, y, width, height);
                  break;
              }
         }
@@ -290,3 +124,196 @@ int main() {
     }
     return 0;
 }
+
+
+
+int maximo(int sizeOne, int sizeTwo) {
+    if (sizeOne > sizeTwo)
+        return sizeOne;
+    return sizeTwo;
+}
+
+int minimo(int sizeOne, int sizeTwo) {
+    if (sizeOne < sizeTwo)
+        return sizeOne;
+    return sizeTwo;
+}
+
+Image escalaCinza(Image img) {
+
+    int width = img.width;
+    int height = img.height;
+
+    for (unsigned int count1 = 0; count1 < img.height; ++count1) {
+        for (unsigned int count2 = 0; count2 < img.width; ++count2) {
+            int media = img.pixel[count1][count2].red +
+                        img.pixel[count1][count2].green +
+                        img.pixel[count1][count2].blue;
+            media /= 3;
+            img.pixel[count1][count2].red = media;
+            img.pixel[count1][count2].green = media;
+            img.pixel[count1][count2].blue = media;
+        }
+    }
+
+    return img;
+}
+
+  Image sepia(Image img) {
+
+    int width = img.width;
+    int height = img.height;
+
+    for (unsigned int count1 = 0; count1 < height; ++count1) {
+        for (unsigned int count2 = 0; count2 < width; ++count2) {
+
+            unsigned short int pixel[3];
+
+            pixel[0] = img.pixel[count1][count2].red;
+            pixel[1] = img.pixel[count1][count2].green;
+            pixel[2] = img.pixel[count1][count2].blue;
+
+            int sample =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
+            int menor_r = minimo(255, sample);
+            img.pixel[count1][count2].red = menor_r;
+
+            sample =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
+            menor_r = minimo(255, sample);
+            img.pixel[count1][count2].green = menor_r;
+
+            sample =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
+            menor_r = minimo(255, sample);
+            img.pixel[count1][count2].blue = menor_r;
+        }
+    }
+
+    return img;
+  }
+
+ Image blur(Image img, int tamanho) {
+
+   Image blur;
+
+   int width = img.width;
+   int height = img.height;
+
+     for (unsigned int count1 = 0; count1 < height; ++count1) {
+         for (unsigned int count2 = 0; count2 < width; ++count2) {
+
+             Pixel media = {0, 0, 0};
+
+             int menor_height = minimo(height - 1, count1 + tamanho/2);
+             int min_width = minimo(width - 1, count2 + tamanho/2);
+
+             for(int countX = maximo(0, count1 - tamanho/2); countX <= menor_height; ++countX) {
+                 for(int countY = maximo(0, count2 - tamanho/2); countY <= min_width; ++countY) {
+                     media.red += img.pixel[countX][countY].red;
+                     media.green += img.pixel[countX][countY].green;
+                     media.blue += img.pixel[countX][countY].blue;
+                 }
+             }
+
+             media.red /= tamanho * tamanho;
+             media.green /= tamanho * tamanho;
+             media.blue /= tamanho * tamanho;
+
+             img.pixel[count1][count2].red = media.red;
+             img.pixel[count1][count2].green = media.green;
+             img.pixel[count1][count2].blue = media.blue;
+         }
+     }
+     return img;
+ }
+
+ Image rotacionar90direita(Image img) {
+
+     Image rotacionada;
+
+     rotacionada.width = img.height;
+     rotacionada.height = img.width;
+
+     int width = rotacionada.width;
+     int height = rotacionada.height;
+
+     for (unsigned int count1 = 0, countY = 0; count1 < height; ++count1, ++countY) {
+         for (int count2 = width - 1, countX = 0; count2 >= 0; --count2, ++countX) {
+             rotacionada.pixel[count1][count2].red = img.pixel[countX][countY].red;
+             rotacionada.pixel[count1][count2].green = img.pixel[countX][countY].green;
+             rotacionada.pixel[count1][count2].blue = img.pixel[countX][countY].blue;
+         }
+     }
+
+     return rotacionada;
+ }
+
+ Image espelhamento(Image img, int horizontal) {
+
+   int width = img.width;
+   int height = img.height;
+
+   if (horizontal == 1)
+      width /= 2;
+   else
+      height /= 2;
+
+   for (int count1 = 0; count1 < height; ++count1) {
+       for (int count2 = 0; count2 < width; ++count2) {
+
+           int countX = count1;
+           int countY = count2;
+
+           if (horizontal == 1)
+            countY = img.width - 1 - count2;
+           else
+            countX = img.height - 1 - count1;
+
+           Pixel sample;
+           sample.red = img.pixel[count1][count2].red;
+           sample.green = img.pixel[count1][count2].green;
+           sample.blue = img.pixel[count1][count2].blue;
+
+           img.pixel[count1][count2].red = img.pixel[countX][countY].red;
+           img.pixel[count1][count2].green = img.pixel[countX][countY].green;
+           img.pixel[count1][count2].blue = img.pixel[countX][countY].blue;
+
+           img.pixel[countX][countY].red = sample.red;
+           img.pixel[countX][countY].green = sample.green;
+           img.pixel[countX][countY].blue = sample.blue;
+       }
+   }
+
+   return img;
+ }
+
+ Image inverterCores(Image img) {
+
+     int width = img.width;
+     int height = img.height;
+
+     for (unsigned int count1 = 0; count1 < height; ++count1) {
+         for (unsigned int count2 = 0; count2 < width; ++count2) {
+             img.pixel[count1][count2].red = 255 - img.pixel[count1][count2].red;
+             img.pixel[count1][count2].green = 255 - img.pixel[count1][count2].green;
+             img.pixel[count1][count2].blue = 255 - img.pixel[count1][count2].blue;
+         }
+     }
+     return img;
+ }
+
+ Image cortarImagem(Image img, int countX, int countY, int width, int height) {
+
+     Image cortada;
+
+     cortada.width = width;
+     cortada.height = height;
+
+     for(int count1 = 0; count1 < height; ++count1) {
+         for(int count2 = 0; count2 < width; ++count2) {
+             cortada.pixel[count1][count2].red = img.pixel[count1 + countY][count2 + countX].red;
+             cortada.pixel[count1][count2].green = img.pixel[count1 + countY][count2 + countX].green;
+             cortada.pixel[count1][count2].blue = img.pixel[count1 + countY][count2 + countX].blue;
+         }
+     }
+
+     return cortada;
+ }
